@@ -29,9 +29,10 @@
 
     <video id="videoPlayer" playsinline autoplay muted></video>
 
-    <button id="unmuteBtn" onclick="unmuteVideo()">🔊 کارکردنی دەنگ</button>
-
-    <script>
+    <div class="controls">
+        <button id="unmuteBtn" onclick="unmuteVideo()">🔊 کارکردنی دەنگ</button>
+        <button onclick="toggleFullScreen()">⛶ پەخشی تەواو</button>
+    </div>
         const video = document.getElementById('videoPlayer');
         const videoSrc = 'https://amg02873-kravemedia-mtrspt1-distrotv-mnsrl.amagi.tv/playlist/amg02873-kravemedia-mtrspt1-distrotv/playlist.m3u8';
 
