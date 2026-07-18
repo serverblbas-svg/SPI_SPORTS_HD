@@ -33,6 +33,8 @@
         <button id="unmuteBtn" onclick="unmuteVideo()">🔊 کارکردنی دەنگ</button>
         <button onclick="toggleFullScreen()">⛶ پەخشی تەواو</button>
     </div>
+
+    <script>
         const video = document.getElementById('videoPlayer');
         const videoSrc = 'https://amg02873-kravemedia-mtrspt1-distrotv-mnsrl.amagi.tv/playlist/amg02873-kravemedia-mtrspt1-distrotv/playlist.m3u8';
 
@@ -46,6 +48,17 @@
         function unmuteVideo() {
             video.muted = false;
             document.getElementById('unmuteBtn').style.display = 'none';
+        }
+
+        // کارکردنی فول سکرین
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                video.requestFullscreen().catch(err => {
+                    alert(`هەڵەیەک ڕوویدا لە کردنەوەی فول سکرین: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
         }
     </script>
 </body>
