@@ -9,7 +9,7 @@
         #videoPlayer { width: 100vw; height: 100vh; object-fit: contain; }
         
         /* لۆگۆکە */
-        #logo { position: absolute; top: 625px; right: 20px; width: 200px; z-index: 10; }
+        #logo { position: absolute; top: 325px; right: 20px; width: 200px; z-index: 10; }
         
         /* ناوەکەی لۆگۆکە */
         #brandName { position: absolute; top: 25px; right: 150px; color: white; 
@@ -33,7 +33,7 @@
 
     <script>
         const video = document.getElementById('videoPlayer');
-        const videoSrc = 'https://bein-esp-xumo.amagi.tv/playlistR720P.m3u8';
+        const videoSrc = 'https://streams2.sofast.tv/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/e0b81a5c-6ab5-48cd-aaa9-f82de4ab5bf9/ffc11d0e-9737-48a2-a13c-ced72c72cad3/1.m3u8';
 
         if (Hls.isSupported()) {
             const hls = new Hls();
