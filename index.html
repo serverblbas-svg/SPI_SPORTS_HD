@@ -80,9 +80,9 @@
 </div>
 
 <script>
-    const quranURL = 'https://live.kwikmotion.com/sharjahtvquranlive/shqurantv.smil/playlist.m3u8';
+    const sportsURL = 'https://live.kwikmotion.com/sharjahtvquranlive/shqurantv.smil/playlist.m3u8';
     const video = document.getElementById('liveVideo');
-    const quranVideo = document.getElementById('quranAudioVideo');
+    const sportsVideo = document.getElementById('quranAudioVideo');
     const overlay = document.getElementById('play-overlay');
 
     // HLS Player Setup
@@ -117,10 +117,10 @@
                 }
             });
 
-            hls.loadSource(quranURL);
-            hls.attachMedia(quranVideo);
-        } else if (quranVideo.canPlayType('application/vnd.apple.mpegurl')) {
-            quranVideo.src = quranURL;
+            hls.loadSource(sportsURL);
+            hls.attachMedia(sportsVideo);
+        } else if (sportsVideo.canPlayType('application/vnd.apple.mpegurl')) {
+            quranVideo.src = sportsURL;
         }
     }
 
@@ -128,9 +128,9 @@
 
     function startPlayer() {
         video.muted = true; 
-        quranVideo.muted = false;
+        sportsVideo.muted = false;
         video.play().catch(e => console.log('Video play error:', e)); 
-        quranVideo.play().catch(e => console.log('Quran play error:', e));
+        sportsVideo.play().catch(e => console.log('Quran play error:', e));
         overlay.classList.add('hidden');
     }
 
