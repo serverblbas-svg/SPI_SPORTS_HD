@@ -22,11 +22,40 @@
         
         #logo { 
             position: absolute; 
-            top: -35px; 
-            right: -53px; 
-            width: 300px; 
+            top: 20px; 
+            right: 20px; 
+            width: 200px; 
             z-index: 20; 
             pointer-events: none; 
+        }
+
+        /* بەشی کۆنتڕۆڵەکان کە بە شێوەیەکی جوان لە خوارەوە دەردەکەوێت */
+        .controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            opacity: 0; 
+            transition: opacity 0.3s ease;
+            z-index: 20;
+        }
+
+        #playerWrapper:hover .controls {
+            opacity: 1;
+        }
+
+        button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -35,26 +64,42 @@
     <div id="playerWrapper">
         <video id="videoPlayer" playsinline autoplay muted></video>
         <img id="logo" src="https://github.com/serverblbas-svg/LOGO/blob/main/SPI%20SPORTS%20HD.png?raw=true" alt="Logo">
+        
+        <div class="controls">
+            <button onclick="playPause()">▶️</button>
+            <button onclick="toggleMute()">🔊</button>
+            <button onclick="toggleFullScreen()">⛶</button>
+        </div>
     </div>
 
     <script>
         const video = document.getElementById('videoPlayer');
+        const wrapper = document.getElementById('playerWrapper');
         const videoSrc = 'https://amg02873-kravemedia-mtrspt1-distrotv-mnsrl.amagi.tv/playlist/amg02873-kravemedia-mtrspt1-distrotv/playlist.m3u8';
 
         if (Hls.isSupported()) {
             const hls = new Hls();
             hls.loadSource(videoSrc);
             hls.attachMedia(video);
-            video.play().catch(e => console.log("Auto-play blocked, interaction required."));
+            video.play();
         }
-        
-        // تێبینی: ئەگەر دەنگت نەهات، کلیکێک لە هەر شوێنێکی پەڕەکە بکە 
-        // بەهۆی سیاسەتی براوسەرەکان کە رێگری لە دەنگی خۆکار دەکەن
-        document.body.addEventListener('click', () => {
-            if (video.muted) {
-                video.muted = false;
+
+        function playPause() {
+            if (video.paused) video.play();
+            else video.pause();
+        }
+
+        function toggleMute() {
+            video.muted = !video.muted;
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen();
+            } else {
+                document.exitFullscreen();
             }
-        }, { once: true });
+        }
     </script>
 </body>
 </html>
