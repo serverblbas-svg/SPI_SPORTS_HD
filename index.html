@@ -7,7 +7,6 @@
     <style>
         body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: sans-serif; }
 
-        /* ئەمە ئەو سێکتەرە نوێیە کە هەموو شتەکانی تێدایە */
         #playerWrapper {
             position: relative;
             width: 100vw;
@@ -15,17 +14,12 @@
             background: #000;
         }
 
-        /* کاتێک ئەم سێکتەرە دەچێتە فول سکرین، با قەبارەکەی 100% بێت */
-        #playerWrapper:-webkit-full-screen { width: 100%; height: 100%; }
-        #playerWrapper:fullscreen { width: 100%; height: 100%; }
-
         #videoPlayer {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* یان cover، بەپێی خواستی خۆت */
+            object-fit: contain;
         }
         
-        /* لۆگۆکە */
         #logo { 
             position: absolute; 
             top: -35px; 
@@ -34,97 +28,33 @@
             z-index: 20; 
             pointer-events: none; 
         }
-        
-        /* کۆنتڕۆڵەکان (دوگمەکان) */
-        .controls { 
-            position: absolute; 
-            bottom: 20px; 
-            right: 20px; 
-            z-index: 20; 
-            display: flex; 
-            gap: 10px; 
-        }
-
-        button { 
-            padding: 12px 20px; 
-            background: rgba(255, 204, 0, 0.9); /* ڕەنگی زەردی تۆختر بە شەفافیەتەوە */
-            border: none; 
-            cursor: pointer; 
-            font-weight: bold; 
-            border-radius: 30px; 
-            font-size: 16px; 
-            transition: background 0.3s;
-        }
-
-        button:hover { background: rgba(255, 255, 255, 0.9); } /* گۆڕانی ڕەنگ لە کاتی دانانی مشک بەسەریدا */
     </style>
 </head>
 <body>
 
-    <!-- ئەمە ئەو سێکتەرە نوێیە کە هەموو شتەکانی تێدایە -->
     <div id="playerWrapper">
-        
-        <!-- ڤیدیۆکە -->
         <video id="videoPlayer" playsinline autoplay muted></video>
-
-        <!-- لۆگۆکە -->
         <img id="logo" src="https://github.com/serverblbas-svg/LOGO/blob/main/SPI%20SPORTS%20HD.png?raw=true" alt="Logo">
-        
-        <!-- دوگمەکان -->
-        <div class="controls">
-            <button id="unmuteBtn" onclick="unmuteVideo()">🔊 کارکردنی دەنگ</button>
-            <button id="fsBtn" onclick="toggleFullScreen()">⛶ پەخشی تەواو</button>
-        </div>
-
     </div>
 
     <script>
         const video = document.getElementById('videoPlayer');
-        // گۆڕانکاری: ئێستا فول سکرین بۆ ئەم سێکتەرە دەکرێت
-        const wrapper = document.getElementById('playerWrapper');
         const videoSrc = 'https://amg02873-kravemedia-mtrspt1-distrotv-mnsrl.amagi.tv/playlist/amg02873-kravemedia-mtrspt1-distrotv/playlist.m3u8';
 
         if (Hls.isSupported()) {
             const hls = new Hls();
             hls.loadSource(videoSrc);
             hls.attachMedia(video);
-            video.play();
+            video.play().catch(e => console.log("Auto-play blocked, interaction required."));
         }
-
-        function unmuteVideo() {
-            video.muted = false;
-            document.getElementById('unmuteBtn').style.display = 'none';
-        }
-
-        // گۆڕانکاری: کردنەی فول سکرین بۆ تەواوی سێکتەرەکە نەک تەنها ڤیدیۆ
-        function toggleFullScreen() {
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                if (wrapper.requestFullscreen) {
-                    wrapper.requestFullscreen();
-                } else if (wrapper.webkitRequestFullscreen) { /* بۆ Safari */
-                    wrapper.webkitRequestFullscreen();
-                }
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { /* بۆ Safari */
-                    document.webkitExitFullscreen();
-                }
+        
+        // تێبینی: ئەگەر دەنگت نەهات، کلیکێک لە هەر شوێنێکی پەڕەکە بکە 
+        // بەهۆی سیاسەتی براوسەرەکان کە رێگری لە دەنگی خۆکار دەکەن
+        document.body.addEventListener('click', () => {
+            if (video.muted) {
+                video.muted = false;
             }
-        }
-
-        // گۆڕانکاری: گۆڕینی دەقی دوگمەی فول سکرین لە کاتی گۆڕانکاری دۆخەکەدا
-        document.addEventListener('fullscreenchange', updateFSButton);
-        document.addEventListener('webkitfullscreenchange', updateFSButton);
-
-        function updateFSButton() {
-            const btn = document.getElementById('fsBtn');
-            if (document.fullscreenElement || document.webkitFullscreenElement) {
-                btn.innerText = '⛶ کەمکردنەوەی شاشە';
-            } else {
-                btn.innerText = '⛶ پەخشی تەواو';
-            }
-        }
+        }, { once: true });
     </script>
 </body>
 </html>
