@@ -2,136 +2,50 @@
 <html lang="ckb" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPI SPORTS HD - پەخشی ڕاستەوخۆ و کاتەکانی بانگ</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>SPI SPORTS HD</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Tahoma', 'Segoe UI', sans-serif; }
-        #app { width: 100%; height: 100%; position: relative; overflow: hidden; }
-
-        #bottom-right-info { position: absolute; bottom: 25px; right: 35px; z-index: 50; text-align: right; color: #fff; display: flex; flex-direction: column; gap: 5px; }
-        #clock-row { display: flex; align-items: center; gap: 15px; }
-        #clock { font-size: 2.4em; font-weight: bold; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
-        #weather-temp { font-size: 1.5em; color: #ffcc00; text-shadow: 0 2px 6px rgba(0,0,0,0.9); font-weight: bold; }
-
-        #bottom-left-info { position: absolute; bottom: 25px; left: 35px; z-index: 50; color: #fff; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; text-align: left; }
-        #hijri-date { font-size: 1.3em; font-weight: bold; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
-        #prayer-countdown-container { display: flex; flex-direction: column; align-items: flex-start; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
-        .prayer-text-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-        .prayer-label { color: #ffcc00; font-size: 1.2em; font-weight: bold; }
-        .prayer-time-box { color: #ffffff; font-size: 1.3em; font-weight: bold; font-family: monospace; }
-        .prayer-info-msg { font-size: 0.85em; color: #cccccc; margin-top: 2px; }
-
-        #play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999999; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: opacity 0.4s; }
-        #play-overlay.hidden { opacity: 0; pointer-events: none; }
-        .play-btn { background: #ffcc00; border: none; color: #000; padding: 15px 35px; font-size: 1.2em; font-weight: bold; border-radius: 50px; box-shadow: 0 10px 30px rgba(255,204,0,0.4); transition: transform 0.2s; }
-        #quranAudioVideo { display: none; }
-
-        @media (max-width: 768px) {
-            #clock { font-size: 1.8em; }
-            #weather-temp { font-size: 1.2em; }
-            #hijri-date { font-size: 1em; }
-            .prayer-label { font-size: 1em; }
-            .prayer-time-box { font-size: 1.1em; }
-            #bottom-right-info { bottom: 15px; right: 15px; }
-            #bottom-left-info { bottom: 15px; left: 15px; }
-        }
+        body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+        #videoPlayer { width: 100vw; height: 100vh; object-fit: contain; }
+        
+        /* لۆگۆکە */
+        #logo { position: absolute; top: 625px; right: 20px; width: 200px; z-index: 10; }
+        
+        /* ناوەکەی لۆگۆکە */
+        #brandName { position: absolute; top: 25px; right: 150px; color: white; 
+                     font-size: 30px; font-weight: bold; z-index: 10; font-family: sans-serif; }
+        
+        /* دوگمەی دەنگ */
+        #unmuteBtn { position: absolute; bottom: 30px; right: 30px; padding: 15px 25px; 
+                     background: #ffcc00; border: none; cursor: pointer; font-weight: bold; 
+                     border-radius: 30px; z-index: 10; font-size: 18px; }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <div id="play-overlay" onclick="startPlayer()">
-        <button class="play-btn">▶️ دەستپێکردنی پەخشی SPI SPORTS HD</button>
-    </div>
+    <!-- لۆگۆ و ناوەکە -->
+    <img id="logo" src="https://github.com/serverblbas-svg/LOGO/blob/main/SPI%20SPORTS%20HD.png?raw=true" alt="Logo">
+    <div id="brandName">  </div>
 
-    <header id="header" class="px-4 md:px-10 lg:px-16 py-3 md:py-5 flex w-full items-center justify-between z-[9999999] fixed top-0 left-0 transition-all duration-300">
-        <div class="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 logo text-2xl md:text-4xl lg:text-4xl font-bold text-white">SPI SPORTS HD</div>
-    </header>
+    <video id="videoPlayer" playsinline autoplay muted></video>
 
-    <section class="main w-full h-screen relative">
-        <video id="liveVideo" class="hero w-full h-full object-cover" src="https://streams2.sofast.tv/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/e0b81a5c-6ab5-48cd-aaa9-f82de4ab5bf9/ffc11d0e-9737-48a2-a13c-ced72c72cad3/1.m3u8" type="video/mp4" autoplay loop muted playsinline></video>
-        <div class="absolute flex items-center justify-center w-full h-full top-0 left-0 px-5 z-40 bg-black/30"></div>
-    </section>
+    <button id="unmuteBtn" onclick="unmuteVideo()">🔊 کارکردنی دەنگ</button>
 
-    <div id="bottom-right-info">
-        <div id="hijri-date">--</div>
-        <div id="clock-row">
-            <span id="clock">00:00:00</span>
-            <span id="weather-temp">-Erbil-°C</span>
-        </div>
-    </div>
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const videoSrc = 'https://streams2.sofast.tv/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/e0b81a5c-6ab5-48cd-aaa9-f82de4ab5bf9/ffc11d0e-9737-48a2-a13c-ced72c72cad3/1.m3u8';
 
-    <div id="bottom-left-info">  
-        <div id="prayer-countdown-container">
-            <div class="prayer-text-row">
-                <span class="prayer-label" id="prayerName">...</span>
-                <span class="prayer-time-box">
-                    <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
-                </span>
-            </div>
-            <div class="prayer-info-msg" id="infoMsg">بارکردنی کاتەکان...</div>
-        </div>
-    </div>
-
-    <video id="quranAudioVideo" playsinline crossorigin="anonymous"></video>
-</div>
-
-<script>
-    const sportsURL = 'https://streams2.sofast.tv/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/e0b81a5c-6ab5-48cd-aaa9-f82de4ab5bf9/ffc11d0e-9737-48a2-a13c-ced72c72cad3/1.m3u8';
-    const video = document.getElementById('liveVideo');
-    const sportsVideo = document.getElementById('quranAudioVideo');
-    const overlay = document.getElementById('play-overlay');
-
-    // HLS Player Setup
-    let hls = null;
-
-    function setupHLS() {
         if (Hls.isSupported()) {
-            hls = new Hls({
-                maxBufferLength: 30,
-                maxMaxBufferLength: 600,
-                liveSyncDurationCount: 3,
-                liveMaxLatencyDurationCount: 10
-            });
-
-            hls.on(Hls.Events.ERROR, function(event, data) {
-                if (data.fatal) {
-                    switch(data.type) {
-                        case Hls.ErrorTypes.NETWORK_ERROR:
-                            console.log('Network error, trying to recover...');
-                            hls.startLoad();
-                            break;
-                        case Hls.ErrorTypes.MEDIA_ERROR:
-                            console.log('Media error, trying to recover...');
-                            hls.recoverMediaError();
-                            break;
-                        default:
-                            console.log('Fatal error, cannot recover');
-                            hls.destroy();
-                            setupHLS();
-                            break;
-                    }
-                }
-            });
-
-            hls.loadSource(sportsURL);
-            hls.attachMedia(sportsVideo);
-        } else if (sportsVideo.canPlayType('application/vnd.apple.mpegurl')) {
-            sportsVideo.src = sportsURL;
+            const hls = new Hls();
+            hls.loadSource(videoSrc);
+            hls.attachMedia(video);
+            video.play();
         }
-    }
 
-    setupHLS();
-
-    function startPlayer() {
-        video.muted = true; 
-        sportsVideo.muted = false;
-        video.play().catch(e => console.log('Video play error:', e)); 
-        sportsVideo.play().catch(e => console.log('Quran play error:', e));
-        overlay.classList.add('hidden');
-    }
+        function unmuteVideo() {
+            video.muted = false;
+            document.getElementById('unmuteBtn').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
