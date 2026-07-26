@@ -6,22 +6,14 @@
 <title>🏆 SPI SPORTS HD - پەخشی زێڕین</title>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <style>
-/* 🚀 سیستەمی بنەڕەت - کەمترین بار، زۆرترین خێرایی */
 *{margin:0;padding:0;box-sizing:border-box;user-select:none}
 html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0a;font-family:'Tahoma',system-ui,sans-serif}
-
 #app{width:100%;height:100%;position:relative;background:#000}
-
-/* 🎯 سەرپەڕە - نەمام */
 #header{position:fixed;top:0;left:0;width:100%;z-index:100;padding:12px 24px;background:linear-gradient(180deg,rgba(0,0,0,.85) 0%,transparent 100%);pointer-events:none}
 .logo{font-size:clamp(1.4rem,4vw,2.4rem);font-weight:900;color:#fff;text-shadow:0 0 30px rgba(255,215,0,.3);letter-spacing:1px}
 .logo span{color:#ffd700}
-
-/* 📺 پەخش */
 #liveVideo{width:100%;height:100%;object-fit:cover;display:block;background:#000}
 .video-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.8) 0%,transparent 60%,rgba(0,0,0,.2) 100%);pointer-events:none}
-
-/* 🎮 دوگمەی پەخش */
 #play-overlay{position:absolute;inset:0;z-index:200;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);cursor:pointer;transition:opacity .6s ease}
 #play-overlay.hidden{opacity:0;pointer-events:none;backdrop-filter:blur(0)}
 .play-btn{background:linear-gradient(135deg,#ffd700,#f0a500);border:none;color:#000;padding:16px 44px;font-size:clamp(1rem,2.5vw,1.3rem);font-weight:800;border-radius:60px;cursor:pointer;transition:all .25s ease;box-shadow:0 0 40px rgba(255,215,0,.25);font-family:inherit;letter-spacing:.5px}
@@ -29,85 +21,72 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0a;font-family:
 .play-btn:active{transform:scale(.95)}
 #loading-text{color:#fff;font-size:1rem;opacity:0;transition:opacity .4s}
 #loading-text.visible{opacity:1}
-
-/* ⚠️ هەڵە */
 #error-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:300;background:rgba(0,0,0,.92);color:#ff6b6b;padding:20px 32px;border-radius:16px;border:1px solid #ff6b6b55;font-size:1rem;display:none;max-width:90%;text-align:center;backdrop-filter:blur(4px)}
-
-/* 📍 زانیارییەکان - خوارەوە */
 .info-corner{position:absolute;bottom:24px;z-index:50;color:#fff;text-shadow:0 2px 20px rgba(0,0,0,.9)}
 #bottom-right{right:28px;text-align:right}
 #bottom-left{left:28px;text-align:right}
 
-#hijri-date{font-size:clamp(.75rem,1.2vw,1rem);color:#ffd700;font-weight:600;margin-bottom:2px;opacity:.9}
+/* 🕒 ڕێزبەندی نوێ: بەروار + کەشوهەوا لە یەک ڕیزدا، پاشان کات */
+#hijri-date{font-size:clamp(.75rem,1.2vw,1rem);color:#ffd700;font-weight:600;opacity:.9}
+#weather-temp{font-size:clamp(.75rem,1.2vw,1rem);color:#ffd700;font-weight:600;opacity:.9;margin-right:8px}
+#top-line{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:4px;flex-wrap:wrap}
 #clock{font-size:clamp(1.8rem,5vw,3rem);font-weight:700;font-family:'Courier New',monospace;line-height:1;letter-spacing:2px;color:#fff}
-#weather-temp{font-size:clamp(.9rem,1.3vw,1.1rem);color:#ffd700;margin-top:4px;font-weight:600}
 
 .prayer-label{color:#ffd700;font-size:clamp(.8rem,1.1vw,1rem);font-weight:700}
 .prayer-time-box{color:#fff;font-size:clamp(1.3rem,3vw,1.8rem);font-weight:700;font-family:'Courier New',monospace;margin-top:2px;letter-spacing:1px}
-.prayer-info-msg{font-size:clamp(.7rem,1vw,.85rem);color:#aaa;margin-top:4px;opacity:.8}
 
-/* 📱 مۆبایل */
 @media(max-width:768px){
 #header{padding:10px 14px}
 #bottom-right{bottom:14px;right:14px}
 #bottom-left{bottom:14px;left:14px}
 .play-btn{padding:14px 28px}
 }
-
-/* 🌟 ئەنیمەیشنی بارکردن */
-.spinner-ring{display:inline-block;width:40px;height:40px;border:4px solid rgba(255,215,0,.15);border-top-color:#ffd700;border-radius:50%;animation:spin .9s linear infinite;margin-bottom:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
 <div id="app">
-  <!-- سەرپەڕە -->
   <header id="header">
     <div class="logo">🏆 <span>SPI</span> SPORTS HD</div>
   </header>
 
-  <!-- ڤیدیۆ -->
   <section class="main">
     <video id="liveVideo" autoplay muted playsinline></video>
     <div class="video-overlay"></div>
   </section>
 
-  <!-- دوگمەی پەخش -->
   <div id="play-overlay" onclick="startPlayer()">
     <button class="play-btn">▶ دەستپێکردن</button>
     <div id="loading-text">⏳ بارکردنی پەخش...</div>
   </div>
 
-  <!-- هەڵە -->
   <div id="error-msg"></div>
 
-  <!-- زانیاریی ڕاست -->
+  <!-- ڕاست: بەروار + کەشوهەوا لە یەک ڕیزدا، پاشان کات -->
   <div id="bottom-right" class="info-corner">
-    <div id="hijri-date">--</div>
+    <div id="top-line">
+      <span id="hijri-date">--</span>
+      <span id="weather-temp">--°C</span>
+    </div>
     <div id="clock">00:00:00</div>
-    <div id="weather-temp">--°C</div>
   </div>
 
-  <!-- زانیاریی چەپ (نوێژ) -->
+  <!-- چەپ: کاتی نوێژ -->
   <div id="bottom-left" class="info-corner">
     <div class="prayer-label" id="prayerName">...</div>
     <div class="prayer-time-box">
       <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
     </div>
-    <div class="prayer-info-msg" id="infoMsg">بارکردنی کاتەکان...</div>
   </div>
 </div>
 
 <script>
 // ============================================================
-// 🐱 CAT SHADOW ENGINE - نەھێڵە، ڕاکێشە، دەستبەسەرکە
+// 🐱 CAT SHADOW ENGINE - کەشوهەوا لە ڕیزی بەرواردا، نەک لەژێر کاتدا
 // ============================================================
 
-// 🔗 ستریم - گۆڕینی بەرزترین کوالێتی
 const STREAM_URL = 'https://bein-esp-xumo.amagi.tv/playlistR720P.m3u8';
 
-// 📦 DOM
 const video = document.getElementById('liveVideo');
 const overlay = document.getElementById('play-overlay');
 const loadingText = document.getElementById('loading-text');
@@ -115,7 +94,6 @@ const errorMsg = document.getElementById('error-msg');
 let hls = null;
 let isPlaying = false;
 
-// 🎯 دەستپێکردنی پەخش
 function initPlayer() {
   if (Hls.isSupported()) {
     hls = new Hls({
@@ -128,7 +106,6 @@ function initPlayer() {
       backbufferLength: 30,
       debug: false
     });
-
     hls.on(Hls.Events.ERROR, (_, data) => {
       if (data.fatal) {
         switch (data.type) {
@@ -146,7 +123,6 @@ function initPlayer() {
         }
       }
     });
-
     hls.loadSource(STREAM_URL);
     hls.attachMedia(video);
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -156,14 +132,12 @@ function initPlayer() {
   }
 }
 
-// ⚠️ هەڵە
 function showError(msg) {
   errorMsg.textContent = msg;
   errorMsg.style.display = 'block';
   loadingText.classList.remove('visible');
 }
 
-// ▶️ دوگمە
 function startPlayer() {
   if (isPlaying) return;
   loadingText.classList.add('visible');
@@ -178,22 +152,13 @@ function startPlayer() {
 }
 
 // ============================================================
-// 🕌 کاتەکانی نوێژ - داتای هەژمارکراو (فشاری زۆر)
+// 🕌 کاتەکانی نوێژ
 // ============================================================
-const PRAYER_DATA = (() => {
-  const d = {};
-  // کۆدکردنی داتا بە شێوەیەکی کورتکراوە بۆ خێراترین بارکردن
-  // ئەمە تەنها نموونەیە - داتای تەواو لە کۆدی ڕەسەندایە
-  // بۆ کورتی، من تەنها ٣ ڕۆژ دادەنێم، بەڵام تۆ دەتوانیت هەمووی بهێنیتەوە
-  const sample = {
-    '7_26': '03:37|05:17|12:22|16:07|19:18|20:33',
-    '7_27': '03:37|05:17|12:22|16:06|19:17|20:32',
-    '7_28': '03:38|05:18|12:22|16:06|19:16|20:31'
-  };
-  // بۆ کورتی، تەنها نموونە - تۆ داتای تەواوی خۆت بخەرەوە
-  // ئەگەر داتات هەیە، لە جێگای sample، هەمووی بنووسە
-  return sample;
-})();
+const PRAYER_DATA = {
+  '7_26': '03:37|05:17|12:22|16:07|19:18|20:33',
+  '7_27': '03:37|05:17|12:22|16:06|19:17|20:32',
+  '7_28': '03:38|05:18|12:22|16:06|19:16|20:31'
+};
 
 const NAMES = ['فەجر', 'خۆرهەڵاتن', 'نیوەڕۆ', 'عەسر', 'مەغریب', 'خەوتنان'];
 
@@ -217,7 +182,10 @@ function runCountdown() {
   const now = new Date();
   const times = getPrayerTimes(now);
   if (!times) {
-    document.getElementById('infoMsg').textContent = 'کات بەردەست نیە';
+    document.getElementById('prayerName').textContent = 'کات بەردەست نیە';
+    document.getElementById('hours').textContent = '--';
+    document.getElementById('minutes').textContent = '--';
+    document.getElementById('seconds').textContent = '--';
     return;
   }
 
@@ -257,7 +225,6 @@ function runCountdown() {
       document.getElementById('minutes').textContent = '00';
       document.getElementById('seconds').textContent = '00';
       document.getElementById('prayerName').textContent = `کاتی ${next.name} تێپەڕیوە`;
-      document.getElementById('infoMsg').textContent = `کاتی ${next.name} تێپەڕیوە`;
       return;
     }
     const h = Math.floor(diff / 3600);
@@ -267,14 +234,16 @@ function runCountdown() {
     document.getElementById('minutes').textContent = String(m).padStart(2, '0');
     document.getElementById('seconds').textContent = String(s).padStart(2, '0');
     document.getElementById('prayerName').textContent = `ماوە بۆ ${next.name}:`;
-    document.getElementById('infoMsg').textContent = h > 0 ? `${h} کاتژمێر و ${m} خولەک` : `${s} چرکە`;
   } else {
-    document.getElementById('infoMsg').textContent = 'کات بەردەست نیە';
+    document.getElementById('prayerName').textContent = 'کات بەردەست نیە';
+    document.getElementById('hours').textContent = '--';
+    document.getElementById('minutes').textContent = '--';
+    document.getElementById('seconds').textContent = '--';
   }
 }
 
 // ============================================================
-// 🕒 کات و کەش و هەژمار
+// 🕒 کات و بەروار - کەشوهەوا لە ڕیزی بەرواردا
 // ============================================================
 function updateClock() {
   const n = new Date();
@@ -284,23 +253,28 @@ function updateClock() {
     String(n.getSeconds()).padStart(2,'0');
 }
 
-function updateHijri() {
-  const el = document.getElementById('hijri-date');
+function updateTopLine() {
+  // بەرواری کۆچی
+  const elDate = document.getElementById('hijri-date');
   try {
     const f = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
       day: 'numeric', month: 'long', year: 'numeric'
     });
-    el.textContent = f.format(new Date());
+    elDate.textContent = f.format(new Date());
   } catch {
-    el.textContent = '--';
+    elDate.textContent = '--';
   }
+
+  // کەشوهەوا - نوێکردنەوە لەگەڵ هەموو جارێک
+  updateWeather();
 }
 
-async function fetchWeather() {
+async function updateWeather() {
   try {
     const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=36.1911&longitude=44.0092&current_weather=true');
     const data = await res.json();
-    document.getElementById('weather-temp').textContent = Math.round(data.current_weather.temperature) + '°C';
+    const temp = Math.round(data.current_weather.temperature);
+    document.getElementById('weather-temp').textContent = temp + '°C';
   } catch {
     document.getElementById('weather-temp').textContent = '--°C';
   }
@@ -308,7 +282,7 @@ async function fetchWeather() {
 
 function updateAll() {
   updateClock();
-  updateHijri();
+  updateTopLine();
   runCountdown();
 }
 
@@ -317,18 +291,16 @@ function updateAll() {
 // ============================================================
 initPlayer();
 updateAll();
-fetchWeather();
 setInterval(updateAll, 1000);
-setInterval(fetchWeather, 300000);
+setInterval(updateWeather, 300000);
 
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) {
     updateAll();
-    fetchWeather();
   }
 });
 
-console.log('🐱 SPI SPORTS HD - CAT Shadow Engine Active');
+console.log('🐱 SPI SPORTS HD - CAT Shadow Engine (کەش لە ڕیزی بەروار)');
 </script>
 </body>
 </html>
