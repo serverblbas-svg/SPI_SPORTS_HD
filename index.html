@@ -117,7 +117,6 @@ document.getElementById('minutes').textContent=String(m).padStart(2,'0');
 document.getElementById('seconds').textContent=String(s).padStart(2,'0');
 document.getElementById('prayerName').textContent=`کاتی ماوە بۆ ${next.name}:`;
 if(h>0)document.getElementById('infoMsg').textContent=`${h} سەعات و ${m} خولەک ماوە`;
-else if(m>0)document.getElementById('infoMsg').textContent=`${m} خولەک ماوە`;
 else document.getElementById('infoMsg').textContent=`${s} چرکە ماوە`;
 }else{document.getElementById('infoMsg').textContent="کاتەکان بەردەست نیەن";}
 }
