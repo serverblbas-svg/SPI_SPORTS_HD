@@ -8,131 +8,349 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Tahoma', 'Segoe UI', sans-serif; }
-        #app { width: 100%; height: 100%; position: relative; overflow: hidden; }
-
-        #bottom-right-info { position: absolute; bottom: 25px; right: 35px; z-index: 50; text-align: right; color: #fff; display: flex; flex-direction: column; gap: 5px; }
-        #clock-row { display: flex; align-items: center; gap: 15px; }
-        #clock { font-size: 2.4em; font-weight: bold; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
-        #weather-temp { font-size: 1.5em; color: #ffcc00; text-shadow: 0 2px 6px rgba(0,0,0,0.9); font-weight: bold; }
-
-        #bottom-left-info { position: absolute; bottom: 25px; left: 35px; z-index: 50; color: #fff; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; text-align: left; }
-        #hijri-date { font-size: 1.3em; font-weight: bold; text-shadow: 0 2px 8px rgba(0,0,0,0.9); }
-        #prayer-countdown-container { display: flex; flex-direction: column; align-items: flex-start; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
-        .prayer-text-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
-        .prayer-label { color: #ffcc00; font-size: 1.2em; font-weight: bold; }
-        .prayer-time-box { color: #ffffff; font-size: 1.3em; font-weight: bold; font-family: monospace; }
-        .prayer-info-msg { font-size: 0.85em; color: #cccccc; margin-top: 2px; }
-
-        #play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999999; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: opacity 0.4s; }
-        #play-overlay.hidden { opacity: 0; pointer-events: none; }
-        .play-btn { background: #ffcc00; border: none; color: #000; padding: 15px 35px; font-size: 1.2em; font-weight: bold; border-radius: 50px; box-shadow: 0 10px 30px rgba(255,204,0,0.4); transition: transform 0.2s; }
-        #sportAudioVideo { display: none; }
-
+        
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+        }
+        
+        #app {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* ===== سەرپەڕ ===== */
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 16px 32px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+        }
+        
+        .logo {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+        }
+        
+        @media (min-width: 768px) {
+            .logo { font-size: 2.8rem; }
+            #header { padding: 20px 40px; }
+        }
+        
+        /* ===== بەشی ڤیدیۆ ===== */
+        .main {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            background: #000;
+        }
+        
+        #liveVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.15);
+            pointer-events: none;
+        }
+        
+        /* ===== پەردەی دەستپێکردن ===== */
+        #play-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: opacity 0.5s ease;
+        }
+        
+        #play-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .play-btn {
+            background: #ffcc00;
+            border: none;
+            color: #000;
+            padding: 18px 42px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255,204,0,0.4);
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 14px 40px rgba(255,204,0,0.6);
+        }
+        
+        #loading-text {
+            color: #fff;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        #loading-text.visible { opacity: 1; }
+        
+        /* ===== هەڵە ===== */
+        #error-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff5555;
+            font-size: 1.1rem;
+            text-align: center;
+            z-index: 250;
+            display: none;
+            background: rgba(0,0,0,0.85);
+            padding: 24px 32px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,85,85,0.3);
+            max-width: 90%;
+        }
+        
+        /* ===== ڕاست-خوارەوە: کات و کەشوهەوا ===== */
+        #bottom-right-info {
+            position: absolute;
+            bottom: 28px;
+            right: 32px;
+            z-index: 50;
+            text-align: right;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+        
+        #hijri-date {
+            font-size: 1.15rem;
+            font-weight: bold;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+            opacity: 0.95;
+            margin-bottom: 2px;
+        }
+        
+        #clock {
+            font-size: 2.4rem;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+            font-family: 'Courier New', monospace;
+            line-height: 1;
+        }
+        
+        #weather-temp {
+            font-size: 1.3rem;
+            color: #ffcc00;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+            font-weight: bold;
+        }
+        
+        /* ===== چەپ-خوارەوە: کاتەکانی بانگ ===== */
+        #bottom-left-info {
+            position: absolute;
+            bottom: 28px;
+            left: 32px;
+            z-index: 50;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        
+        .prayer-text-row {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+        }
+        
+        .prayer-label {
+            color: #ffcc00;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        
+        .prayer-time-box {
+            color: #ffffff;
+            font-size: 1.4rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .prayer-info-msg {
+            font-size: 0.95rem;
+            color: #dddddd;
+            margin-top: 4px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+        }
+        
+        /* ===== مۆبایل ===== */
         @media (max-width: 768px) {
-            #clock { font-size: 1.8em; }
-            #weather-temp { font-size: 1.2em; }
-            #hijri-date { font-size: 1em; }
-            .prayer-label { font-size: 1em; }
-            .prayer-time-box { font-size: 1.1em; }
-            #bottom-right-info { bottom: 15px; right: 15px; }
-            #bottom-left-info { bottom: 15px; left: 15px; }
+            .logo { font-size: 1.6rem; }
+            #header { padding: 12px 16px; }
+            #clock { font-size: 1.8rem; }
+            #weather-temp { font-size: 1.1rem; }
+            #hijri-date { font-size: 0.95rem; }
+            .prayer-label { font-size: 1.05rem; }
+            .prayer-time-box { font-size: 1.15rem; }
+            #bottom-right-info { bottom: 16px; right: 16px; }
+            #bottom-left-info { bottom: 16px; left: 16px; }
+            .play-btn { padding: 14px 30px; font-size: 1.05rem; }
         }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <div id="play-overlay" onclick="startPlayer()">
-        <button class="play-btn">▶️ دەستپێکردنی پەخشی SPI SPORTS HD</button>
-    </div>
-
-    <header id="header" class="px-4 md:px-10 lg:px-16 py-3 md:py-5 flex w-full items-center justify-between z-[9999999] fixed top-0 left-0 transition-all duration-300">
-        <div class="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 logo text-2xl md:text-4xl lg:text-4xl font-bold text-white">SPI SPORTS HD</div>
+    <!-- سەرپەڕ -->
+    <header id="header">
+        <div class="logo">SPI SPORTS HD</div>
     </header>
 
-    <section class="main w-full h-screen relative">
-        <video id="liveVideo" class="hero w-full h-full object-cover" src="https://bein-esp-xumo.amagi.tv/playlistR720P.m3u8" type="video/mp4" autoplay loop muted playsinline></video>
-        <div class="absolute flex items-center justify-center w-full h-full top-0 left-0 px-5 z-40 bg-black/30"></div>
+    <!-- بەشی ڤیدیۆ -->
+    <section class="main">
+        <video id="liveVideo" autoplay muted playsinline></video>
+        <div class="video-overlay"></div>
     </section>
 
+    <!-- پەردەی دەستپێکردن -->
+    <div id="play-overlay" onclick="startPlayer()">
+        <button class="play-btn">▶️ دەستپێکردنی پەخشی ڕاستەوخۆ</button>
+        <div id="loading-text">⏳ بارکردنی پەخش...</div>
+    </div>
+
+    <!-- پەیامی هەڵە -->
+    <div id="error-msg"></div>
+
+    <!-- ڕاست-خوارەوە: ڕۆژی کۆچی، کات، کەشوهەوا -->
     <div id="bottom-right-info">
         <div id="hijri-date">--</div>
-        <div id="clock-row">
-            <span id="clock">00:00:00</span>
-            <span id="weather-temp">-Erbil-°C</span>
-        </div>
+        <div id="clock">00:00:00</div>
+        <div id="weather-temp">--°C</div>
     </div>
 
-    <div id="bottom-left-info">  
-        <div id="prayer-countdown-container">
-            <div class="prayer-text-row">
-                <span class="prayer-label" id="prayerName">...</span>
-                <span class="prayer-time-box">
-                    <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
-                </span>
-            </div>
-            <div class="prayer-info-msg" id="infoMsg">بارکردنی کاتەکان...</div>
+    <!-- چەپ-خوارەوە: ژمێرەرەوەی بانگ -->
+    <div id="bottom-left-info">
+        <div class="prayer-text-row">
+            <span class="prayer-label" id="prayerName">...</span>
+            <span class="prayer-time-box">
+                <span id="hours">00</span>:<span id="minutes">00</span>:<span id="seconds">00</span>
+            </span>
         </div>
+        <div class="prayer-info-msg" id="infoMsg">بارکردنی کاتەکان...</div>
     </div>
-
-    <video id="sportAudioVideo" playsinline crossorigin="anonymous"></video>
 </div>
 
 <script>
-    const sportURL = 'https://bein-esp-xumo.amagi.tv/playlistR720P.m3u8';
+    // ==================== ڕێکخستنەکان ====================
+    const STREAM_URL = 'https://bein-esp-xumo.amagi.tv/playlistR720P.m3u8';
     const video = document.getElementById('liveVideo');
-    const sportVideo = document.getElementById('sportAudioVideo');
     const overlay = document.getElementById('play-overlay');
+    const loadingText = document.getElementById('loading-text');
+    const errorMsg = document.getElementById('error-msg');
 
-    // HLS Player Setup
+    // ==================== پەخشکەر (HLS) ====================
     let hls = null;
+    let isPlaying = false;
 
-    function setupHLS() {
+    function initPlayer() {
         if (Hls.isSupported()) {
             hls = new Hls({
                 maxBufferLength: 30,
                 maxMaxBufferLength: 600,
                 liveSyncDurationCount: 3,
-                liveMaxLatencyDurationCount: 10
+                liveMaxLatencyDurationCount: 10,
+                debug: false
             });
 
+            // چارەسەرکردنی هەڵەکان
             hls.on(Hls.Events.ERROR, function(event, data) {
+                console.error('HLS Error:', data);
+                
                 if (data.fatal) {
                     switch(data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            console.log('Network error, trying to recover...');
+                            console.log('هەڵەی ڕایەڵە، هەوڵدانەوە...');
                             hls.startLoad();
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
-                            console.log('Media error, trying to recover...');
+                            console.log('هەڵەی میدیا، هەوڵدانەوە...');
                             hls.recoverMediaError();
                             break;
                         default:
-                            console.log('Fatal error, cannot recover');
+                            showError('کێشەیەک لە پەخش هەیە، تکایە دواتر هەوڵبدەرەوە');
                             hls.destroy();
-                            setupHLS();
                             break;
                     }
                 }
             });
 
-            hls.loadSource(sportURL);
-            hls.attachMedia(sportVideo);
-        } else if (sportVideo.canPlayType('application/vnd.apple.mpegurl')) {
-            sportVideo.src = sportURL;
+            hls.loadSource(STREAM_URL);
+            hls.attachMedia(video);
+            
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            // پشتگیری سروشتی HLS (Safari)
+            video.src = STREAM_URL;
+        } else {
+            showError('برووسەرەکەت پشتگیری لەم جۆرە پەخشە ناکات');
         }
     }
 
-    setupHLS();
+    function showError(msg) {
+        errorMsg.textContent = msg;
+        errorMsg.style.display = 'block';
+        loadingText.classList.remove('visible');
+    }
 
     function startPlayer() {
-        video.muted = true; 
-        sportVideo.muted = false;
-        video.play().catch(e => console.log('Video play error:', e)); 
-        sportVideo.play().catch(e => console.log('sport play error:', e));
-        overlay.classList.add('hidden');
+        if (isPlaying) return;
+        
+        loadingText.classList.add('visible');
+        
+        video.play()
+            .then(() => {
+                isPlaying = true;
+                video.muted = false;
+                overlay.classList.add('hidden');
+                loadingText.classList.remove('visible');
+            })
+            .catch(err => {
+                console.error('Play error:', err);
+                showError('ناتوانرێت پەخش بکرێت، تکایە برووسەرەکەت بپشکنە');
+            });
     }
+
+    // دەستپێکردنی پەخشکەر لە کاتی بارکردن
+    initPlayer();
 
     // ==================== PRAYER DATA FROM erbil.csv ====================
     // داتاکان ڕاستەوخۆ لە فایلی erbil.csv وەرگیراون
