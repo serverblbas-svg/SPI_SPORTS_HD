@@ -27,7 +27,7 @@
         #play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999999; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: opacity 0.4s; }
         #play-overlay.hidden { opacity: 0; pointer-events: none; }
         .play-btn { background: #ffcc00; border: none; color: #000; padding: 15px 35px; font-size: 1.2em; font-weight: bold; border-radius: 50px; box-shadow: 0 10px 30px rgba(255,204,0,0.4); transition: transform 0.2s; }
-        #quranAudioVideo { display: none; }
+        #sportAudioVideo { display: none; }
 
         @media (max-width: 768px) {
             #clock { font-size: 1.8em; }
@@ -76,13 +76,13 @@
         </div>
     </div>
 
-    <video id="quranAudioVideo" playsinline crossorigin="anonymous"></video>
+    <video id="sportAudioVideo" playsinline crossorigin="anonymous"></video>
 </div>
 
 <script>
-    const quranURL = 'https://streams2.sofast.tv/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/e0b81a5c-6ab5-48cd-aaa9-f82de4ab5bf9/ffc11d0e-9737-48a2-a13c-ced72c72cad3/1.m3u8';
+    const sportURL = 'https://streams2.sofast.tv/v1/manifest/611d79b11b77e2f571934fd80ca1413453772ac7/e0b81a5c-6ab5-48cd-aaa9-f82de4ab5bf9/ffc11d0e-9737-48a2-a13c-ced72c72cad3/1.m3u8';
     const video = document.getElementById('liveVideo');
-    const quranVideo = document.getElementById('quranAudioVideo');
+    const sportVideo = document.getElementById('sportAudioVideo');
     const overlay = document.getElementById('play-overlay');
 
     // HLS Player Setup
@@ -117,10 +117,10 @@
                 }
             });
 
-            hls.loadSource(quranURL);
-            hls.attachMedia(quranVideo);
-        } else if (quranVideo.canPlayType('application/vnd.apple.mpegurl')) {
-            quranVideo.src = quranURL;
+            hls.loadSource(sportURL);
+            hls.attachMedia(sportVideo);
+        } else if (sportVideo.canPlayType('application/vnd.apple.mpegurl')) {
+            sportVideo.src = sportURL;
         }
     }
 
@@ -128,9 +128,9 @@
 
     function startPlayer() {
         video.muted = true; 
-        quranVideo.muted = false;
+        sportVideo.muted = false;
         video.play().catch(e => console.log('Video play error:', e)); 
-        quranVideo.play().catch(e => console.log('Quran play error:', e));
+        sportVideo.play().catch(e => console.log('sport play error:', e));
         overlay.classList.add('hidden');
     }
 
